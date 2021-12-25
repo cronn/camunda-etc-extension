@@ -1,0 +1,108 @@
+plugins {
+	id "java-library"
+	id "maven-publish"
+	id "signing"
+}
+
+repositories {
+	mavenCentral()
+}
+
+sourceCompatibility = JavaVersion.VERSION_11
+targetCompatibility = JavaVersion.VERSION_11
+
+compileJava.options.encoding = "UTF-8"
+
+java {
+	withSourcesJar()
+	withJavadocJar()
+}
+
+ext {
+	camundaVersion = "7.15.0"
+}
+
+dependencies {
+	api "org.camunda.bpm:camunda-external-task-client:${camundaVersion}"
+	api "org.apache.commons:commons-lang3:3.12.0"
+
+	testImplementation platform("org.springframework.boot:spring-boot-dependencies:2.5.4")
+	testImplementation platform("org.camunda.bpm:camunda-bom:${camundaVersion}")
+	testImplementation "org.junit.jupiter:junit-jupiter"
+	testImplementation "org.assertj:assertj-core"
+	testImplementation "org.awaitility:awaitility"
+	testImplementation "org.springframework.boot:spring-boot-starter-test"
+	testImplementation "com.h2database:h2"
+	testImplementation "org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-rest"
+	testImplementation "org.camunda.bpm:camunda-engine-plugin-spin"
+	testImplementation "org.camunda.spin:camunda-spin-dataformat-all"
+	testImplementation "org.camunda.bpm.extension:camunda-bpm-junit5:1.0.1"
+	testImplementation "org.camunda.bpm.extension.mockito:camunda-bpm-mockito:5.14.0"
+	testImplementation "org.camunda.bpm.assert:camunda-bpm-assert:13.0.0"
+	testImplementation "com.google.guava:guava:31.0.1-jre"
+}
+
+group = "de.cronn"
+version = System.env.ARTIFACT_VERSION ?: "SNAPSHOT"
+
+test {
+	useJUnitPlatform()
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			groupId project.group
+			artifactId project.name
+			version project.version
+			from components.java
+
+			pom {
+				name = project.name
+				description = "Cronn Camunda External Task Handler Extension"
+				url = "https://github.com/cronn/camunda-etc-extension"
+
+				licenses {
+					license {
+						name = "The Apache Software License, Version 2.0"
+						url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+					}
+				}
+
+				developers {
+					developer {
+						name = "Radosław Postołowicz"
+						email = "radoslaw.postolowicz@cronn.de"
+					}
+				}
+
+				scm {
+					url = "https://github.com/cronn/camunda-etc-extension"
+				}
+
+				versionMapping {
+					usage('java-api') {
+						fromResolutionOf('runtimeClasspath')
+					}
+					usage('java-runtime') {
+						fromResolutionResult()
+					}
+				}
+			}
+
+		}
+	}
+	repositories {
+		maven {
+			url "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2"
+			credentials {
+				username = project.hasProperty('nexusUsername') ? project.property('nexusUsername') : System.getenv('NEXUS_USERNAME')
+				password = project.hasProperty('nexusPassword') ? project.property('nexusPassword') : System.getenv('NEXUS_PASSWORD')
+			}
+		}
+	}
+}
+
+signing {
+	sign publishing.publications.mavenJava
+}
