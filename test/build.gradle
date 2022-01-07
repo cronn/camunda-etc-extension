@@ -1,0 +1,15 @@
+dependencies {
+	runtimeOnly "com.h2database:h2"
+	api "org.camunda.bpm:camunda-engine"
+	api "org.camunda.bpm:camunda-engine-rest-jaxrs2"
+	api "org.apache.cxf:cxf-rt-frontend-jaxrs:${cxfVersion}"
+	api "org.eclipse.jetty:jetty-servlet"
+	api "org.camunda.bpm:camunda-engine-plugin-spin"
+
+	api "org.camunda.bpm:camunda-external-task-client:${camundaVersion}"
+	api "org.camunda.bpm.assert:camunda-bpm-assert:${bpmAssertVersion}"
+	api "org.assertj:assertj-core"
+	api "org.junit.jupiter:junit-jupiter"
+	api "org.awaitility:awaitility"
+
+}

@@ -1,0 +1,8 @@
+dependencies {
+	api project(":test")
+
+	api "org.springframework:spring-test"
+	api "org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-external-task-client"
+
+	testImplementation "org.springframework.boot:spring-boot-starter-test"
+}

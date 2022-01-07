@@ -1,108 +1,132 @@
 plugins {
-	id "java-library"
-	id "maven-publish"
-	id "signing"
+	id "io.spring.dependency-management" version "1.0.11.RELEASE" apply false
 }
 
-repositories {
-	mavenCentral()
-}
+allprojects {
+	apply plugin: "java-library"
+	apply plugin: "maven-publish"
+	apply plugin: "signing"
+	apply plugin: "io.spring.dependency-management"
 
-sourceCompatibility = JavaVersion.VERSION_11
-targetCompatibility = JavaVersion.VERSION_11
+	repositories {
+		mavenCentral()
+	}
 
-compileJava.options.encoding = "UTF-8"
+	sourceCompatibility = JavaVersion.VERSION_11
+	targetCompatibility = JavaVersion.VERSION_11
 
-java {
-	withSourcesJar()
-	withJavadocJar()
-}
+	compileJava.options.encoding = "UTF-8"
 
-ext {
-	camundaVersion = "7.15.0"
+	java {
+		withSourcesJar()
+		withJavadocJar()
+	}
+
+	ext {
+		camundaVersion = "7.15.0"
+		springBootVersion = "2.5.5"
+		bpmAssertVersion = "13.0.0"
+		cxfVersion = "3.4.5"
+		throwingFunctionVersion = "1.5.1"
+	}
+
+	dependencyManagement {
+		imports {
+			mavenBom "org.camunda.bpm:camunda-bom:${camundaVersion}"
+			mavenBom "org.springframework.boot:spring-boot-dependencies:${springBootVersion}"
+		}
+		generatedPomCustomization {
+			enabled = false
+		}
+	}
+
+	group = "de.cronn"
+	version = System.env.ARTIFACT_VERSION ?: "SNAPSHOT"
+
+	test {
+		useJUnitPlatform()
+	}
+
+	dependencies {
+		testImplementation "org.junit.jupiter:junit-jupiter"
+		testImplementation "org.assertj:assertj-core"
+		testImplementation "org.mockito:mockito-core"
+		testImplementation "com.pivovarit:throwing-function:${throwingFunctionVersion}"
+	}
+
+	def _project = it
+
+	publishing {
+		publications {
+			mavenJava(MavenPublication) {
+				def projectName = (_project.parent != null) ?
+						_project.parent.name + "-" + _project.name :
+						_project.name
+				groupId _project.group
+				artifactId projectName
+				version _project.version
+				from _project.components.java
+
+				pom {
+					name = projectName
+					description = "Cronn Camunda External Task Handler Extension"
+					url = "https://github.com/cronn/camunda-etc-extension"
+
+					licenses {
+						license {
+							name = "The Apache Software License, Version 2.0"
+							url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
+						}
+					}
+
+					developers {
+						developer {
+							name = "Radosław Postołowicz"
+							email = "radoslaw.postolowicz@cronn.de"
+						}
+					}
+
+					scm {
+						url = "https://github.com/cronn/camunda-etc-extension"
+					}
+
+					versionMapping {
+						usage('java-api') {
+							fromResolutionOf('runtimeClasspath')
+						}
+						usage('java-runtime') {
+							fromResolutionResult()
+						}
+					}
+				}
+
+			}
+		}
+		repositories {
+			maven {
+				url "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2"
+				credentials {
+					username = _project.hasProperty('nexusUsername') ? _project.property('nexusUsername') : System.getenv('NEXUS_USERNAME')
+					password = _project.hasProperty('nexusPassword') ? _project.property('nexusPassword') : System.getenv('NEXUS_PASSWORD')
+				}
+			}
+		}
+	}
+
+	signing {
+		sign publishing.publications.mavenJava
+	}
+
 }
 
 dependencies {
 	api "org.camunda.bpm:camunda-external-task-client:${camundaVersion}"
 	api "org.apache.commons:commons-lang3:3.12.0"
 
-	testImplementation platform("org.springframework.boot:spring-boot-dependencies:2.5.4")
-	testImplementation platform("org.camunda.bpm:camunda-bom:${camundaVersion}")
-	testImplementation "org.junit.jupiter:junit-jupiter"
-	testImplementation "org.assertj:assertj-core"
 	testImplementation "org.awaitility:awaitility"
-	testImplementation "org.springframework.boot:spring-boot-starter-test"
-	testImplementation "com.h2database:h2"
-	testImplementation "org.camunda.bpm.springboot:camunda-bpm-spring-boot-starter-rest"
-	testImplementation "org.camunda.bpm:camunda-engine-plugin-spin"
-	testImplementation "org.camunda.spin:camunda-spin-dataformat-all"
-	testImplementation "org.camunda.bpm.extension:camunda-bpm-junit5:1.0.1"
-	testImplementation "org.camunda.bpm.extension.mockito:camunda-bpm-mockito:5.14.0"
+	testImplementation "org.camunda.spin:camunda-spin-dataformat-json-jackson"
 	testImplementation "org.camunda.bpm.assert:camunda-bpm-assert:13.0.0"
 	testImplementation "com.google.guava:guava:31.0.1-jre"
-}
 
-group = "de.cronn"
-version = System.env.ARTIFACT_VERSION ?: "SNAPSHOT"
-
-test {
-	useJUnitPlatform()
-}
-
-publishing {
-	publications {
-		mavenJava(MavenPublication) {
-			groupId project.group
-			artifactId project.name
-			version project.version
-			from components.java
-
-			pom {
-				name = project.name
-				description = "Cronn Camunda External Task Handler Extension"
-				url = "https://github.com/cronn/camunda-etc-extension"
-
-				licenses {
-					license {
-						name = "The Apache Software License, Version 2.0"
-						url = "http://www.apache.org/licenses/LICENSE-2.0.txt"
-					}
-				}
-
-				developers {
-					developer {
-						name = "Radosław Postołowicz"
-						email = "radoslaw.postolowicz@cronn.de"
-					}
-				}
-
-				scm {
-					url = "https://github.com/cronn/camunda-etc-extension"
-				}
-
-				versionMapping {
-					usage('java-api') {
-						fromResolutionOf('runtimeClasspath')
-					}
-					usage('java-runtime') {
-						fromResolutionResult()
-					}
-				}
-			}
-
-		}
-	}
-	repositories {
-		maven {
-			url "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2"
-			credentials {
-				username = project.hasProperty('nexusUsername') ? project.property('nexusUsername') : System.getenv('NEXUS_USERNAME')
-				password = project.hasProperty('nexusPassword') ? project.property('nexusPassword') : System.getenv('NEXUS_PASSWORD')
-			}
-		}
-	}
-}
-
-signing {
-	sign publishing.publications.mavenJava
+	testImplementation project(":test")
 }

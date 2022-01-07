@@ -60,8 +60,7 @@ class JsonVariablesTest extends ExternalTaskHandlerIntegrationTest {
 		}
 	}
 
-	@Autowired
-	private ObjectMapper objectMapper;
+	private final ObjectMapper objectMapper = new ObjectMapper();
 
 	private final SampleObject sampleObject = new SampleObject("value", 1234);
 

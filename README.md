@@ -72,3 +72,14 @@ Add the following Maven dependency to your project:
     <version>0.1.0</version>
 </dependency>
 ```
+
+## Bonus
+
+There are two more artifacts: `de.cronn:camunda-etc-extension-test`
+and `de.cronn:camunda-etc-extension-test-spring-boot`. They provide infrastructure for easy `ExternalTaskHandler` integration
+testing. 
+See:
+ - for non Spring usage: [`EmbeddedCamundaTest`](test/src/main/java/de/cronn/camunda/testserver/EmbeddedCamundaTest.java)
+and [`SampleEmbeddedCamundaTest`](test/src/test/java/de/cronn/camunda/testserver/SampleEmbeddedCamundaTest.java)
+ - for Spring Boot use case: [`SpringEmbeddedCamundaTest`](test-spring-boot/src/main/java/de/cronn/camunda/testserver/spring/SpringEmbeddedCamundaTest.java)
+and [`SampleSpringEmbeddedCamundaTest`](test-spring-boot/src/test/java/de/cronn/camunda/testserver/spring/SampleSpringEmbeddedCamundaTest.java)
