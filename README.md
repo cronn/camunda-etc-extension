@@ -69,7 +69,7 @@ Add the following Maven dependency to your project:
 <dependency>
     <groupId>de.cronn</groupId>
     <artifactId>camunda-etc-extension</artifactId>
-    <version>0.1.0</version>
+    <version>0.2.0</version>
 </dependency>
 ```
 
