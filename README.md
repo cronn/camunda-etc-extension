@@ -1,3 +1,4 @@
+[![CI](https://github.com/cronn/camunda-etc-extension/workflows/CI/badge.svg)](https://github.com/cronn/camunda-etc-extension/actions)
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.cronn/camunda-etc-extension/badge.svg)](http://maven-badges.herokuapp.com/maven-central/de.cronn/camunda-etc-extension)
 [![Apache 2.0](https://img.shields.io/github/license/cronn/camunda-etc-extension.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
