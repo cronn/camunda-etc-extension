@@ -1,11 +1,9 @@
 package de.cronn.camunda;
 
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.List;
-import java.util.stream.Collectors;
 
-import org.apache.commons.lang3.reflect.MethodUtils;
+import de.cronn.camunda.dynamicmethod.DynamicMethod;
+
 import org.camunda.bpm.client.task.ExternalTask;
 import org.camunda.bpm.client.task.ExternalTaskService;
 import org.slf4j.Logger;
@@ -16,31 +14,10 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 public abstract class ExternalTaskHandler implements org.camunda.bpm.client.task.ExternalTaskHandler {
 	protected final Logger log = LoggerFactory.getLogger(this.getClass().getName());
 
-	private final Method handlerMethod;
-	private final List<ArgumentResolver> argumentResolvers;
+	private final DynamicHandlerMethod handlerMethod;
 
 	protected ExternalTaskHandler(ObjectMapper objectMapper) {
-		handlerMethod = findHandlerMethod(getClass());
-		argumentResolvers = ArgumentResolver.createArgumentResolvers(handlerMethod, objectMapper);
-	}
-
-	private static Method findHandlerMethod(Class<?> clazz) {
-		List<Method> annotatedMethods = MethodUtils.getMethodsListWithAnnotation(clazz, HandlerMethod.class, true, true);
-		annotatedMethods.removeIf(Method::isSynthetic);
-		if (annotatedMethods.size() != 1) {
-			throw new IllegalStateException(
-				String.format(
-					"Expected exactly one method annotated with %s but got: %s",
-					HandlerMethod.class.getSimpleName(),
-					annotatedMethods.stream().map(Method::getName).collect(Collectors.joining(", ", "[", "]"))
-				)
-			);
-		}
-		Method handlerMethod = annotatedMethods.get(0);
-		if (!void.class.equals(handlerMethod.getReturnType())) {
-			throw new IllegalStateException("Handler method must return " + void.class.getSimpleName());
-		}
-		return handlerMethod;
+		handlerMethod = new DynamicHandlerMethod(DynamicHandlerMethod.findHandlerMethod(getClass()), objectMapper);
 	}
 
 	@Override
@@ -60,12 +37,8 @@ public abstract class ExternalTaskHandler implements org.camunda.bpm.client.task
 			);
 		}
 
-		Object[] arguments = argumentResolvers.stream()
-			.map(argumentResolver -> argumentResolver.resolve(externalTask, externalTaskService))
-			.toArray();
 		try {
-			handlerMethod.setAccessible(true);
-			handlerMethod.invoke(this, arguments);
+			handlerMethod.invoke(this, externalTask, externalTaskService);
 		} catch (InvocationTargetException e) {
 			Throwable targetException = e.getTargetException();
 			if (targetException instanceof RuntimeException) {
@@ -83,6 +56,11 @@ public abstract class ExternalTaskHandler implements org.camunda.bpm.client.task
 		public WrappedException(Throwable cause) {
 			super(cause);
 		}
+	}
+
+	interface ExternalTaskAndExternalTaskService extends DynamicMethod.StaticArguments {
+		ExternalTask getExternalTask();
+		ExternalTaskService getExternalTaskService();
 	}
 
 }

@@ -17,7 +17,11 @@ public class CurrentExternalTask implements ExternalTask {
 	private final ExternalTaskService externalTaskService;
 	private final ExternalTask externalTask;
 
-	public CurrentExternalTask(ExternalTaskService externalTaskService, ExternalTask externalTask) {
+	public CurrentExternalTask(ExternalTaskHandler.ExternalTaskAndExternalTaskService input) {
+		this(input.getExternalTaskService(), input.getExternalTask());
+	}
+
+	CurrentExternalTask(ExternalTaskService externalTaskService, ExternalTask externalTask) {
 		this.externalTaskService = externalTaskService;
 		this.externalTask = externalTask;
 	}
