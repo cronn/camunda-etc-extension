@@ -21,7 +21,7 @@ public abstract class ExternalTaskHandler implements org.camunda.bpm.client.task
 	}
 
 	@Override
-	public final void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
+	public void execute(ExternalTask externalTask, ExternalTaskService externalTaskService) {
 		if (log.isDebugEnabled()) {
 			log.debug(
 				"Executing external task with id={}, processInstanceId={}, variables={}",
