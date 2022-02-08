@@ -15,19 +15,19 @@ public class EmbeddedCamundaTest extends BpmnAwareTests {
 	protected ExternalTaskClient externalTaskClient;
 
 	@BeforeAll
-	static void startServer() throws Exception {
+	protected static void startServer() throws Exception {
 		camundaRestServer.start();
 		AbstractAssertions.init(camundaRestServer.getProcessEngine());
 	}
 
 	@AfterAll
-	static void stopServer() throws Exception {
+	protected static void stopServer() throws Exception {
 		camundaRestServer.stop();
 		AbstractAssertions.reset();
 	}
 
 	@BeforeEach
-	void createExternalTaskClient() {
+	protected void createExternalTaskClient() {
 		externalTaskClient = new ExternalTaskClientBuilderImpl()
 			.baseUrl("http://localhost:" + camundaRestServer.getPort() + "/engine-rest/")
 			.disableAutoFetching()
@@ -35,7 +35,7 @@ public class EmbeddedCamundaTest extends BpmnAwareTests {
 	}
 
 	@AfterEach
-	void stopExternalTaskClient() {
+	protected void stopExternalTaskClient() {
 		externalTaskClient.stop();
 	}
 
