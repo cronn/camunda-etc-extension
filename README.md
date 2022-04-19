@@ -2,6 +2,8 @@
 [![Maven Central](https://maven-badges.herokuapp.com/maven-central/de.cronn/camunda-etc-extension/badge.svg)](http://maven-badges.herokuapp.com/maven-central/de.cronn/camunda-etc-extension)
 [![Apache 2.0](https://img.shields.io/github/license/cronn/camunda-etc-extension.svg)](http://www.apache.org/licenses/LICENSE-2.0)
 
+[![Valid Gradle Wrapper](https://github.com/cronn/camunda-etc-extension/workflows/Validate%20Gradle%20Wrapper/badge.svg)](https://github.com/cronn/camunda-etc-extension/actions/workflows/gradle-wrapper-validation.yml)
+[![Gradle Status](https://gradleupdate.appspot.com/cronn/camunda-etc-extension/status.svg)](https://gradleupdate.appspot.com/cronn/camunda-etc-extension/status)
 # Cronn Camunda External Task Handler Extension
 
 Extension of https://github.com/camunda/camunda-bpm-platform/tree/master/clients/java
